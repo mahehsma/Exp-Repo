@@ -19,9 +19,17 @@ public class TicTacMain {
 		for (int i = 0; i < 9; i++) {
 			if (pcOrPlayer == true) {
 				System.out.println("PC setzt!");
-				int set = 0;
-				int pcSet = pcChoose(XO, pcOrPlayer, set);
-				XO[pcSet] = 1;
+				float[] pcSet=new float[9];
+				pcSet = pcChoose(XO, pcOrPlayer);
+				int set=0;
+				for (int j=0;j<8;j++) {
+					System.out.println(pcSet[j]);
+					if (pcSet[j]<pcSet[j+1]) {
+						set=j+1;
+					}
+				}
+				XO[set] = 1;
+				System.out.println(set);
 				pcOrPlayer = false;
 			} else {
 				System.out.println("Wähle ein Feld (0-8)");
@@ -38,48 +46,53 @@ public class TicTacMain {
 				break;
 			} else if (win == true && pcOrPlayer == false) {
 				System.out.println("PC hat gewonnen!");
+				i=8;
 				break;
 			}
 		}
+		for (int j=0; j<9;j++) {
+			System.out.print(XO[j]);
+		}
 	}
 
-	public static int pcChoose(int XO[], boolean pcOrPlayer, int set) {
-		int XOminimax[] = new int[9];
-		int thisField[] = new int[9];
+	public static float[] pcChoose(int xOrO[], boolean pcOrPlayer) {
+		float XOminimax[] = new float[9];
+		float thisField[]=new float[9];
+
 		for (int i = 0; i < 9; i++) {
-			XOminimax[i] = XO[i];
-		}
-		for (int i = 0; i < 9; i++) {
-			if (XOminimax[i] == 0) {
+			if (xOrO[i] == 0) {//i=0?
+				if (i != 0) {
+					xOrO[i - 1] = 0;
+				}
 				if (pcOrPlayer == true) {
-					XOminimax[i] = 1;
+					xOrO[i] = 1;
 					pcOrPlayer = false;
 				} else {
+					xOrO[i] = 4;
 					pcOrPlayer = true;
-					XOminimax[i] = 4;
 				}
-				if (hasWon(XOminimax) == true) {
-					if (pcOrPlayer == false) {
-						set = -1;
-					} else if (pcOrPlayer == true) {
-						set = 1;
+				if (hasWon(xOrO) == true) {
+					if (pcOrPlayer == true) {
+						XOminimax[i]=0;
+					} else {
+						XOminimax[i]=3;
 					}
-				} else if (i == 8) {
-					set = 0;
-				} else {
-					thisField[i] = pcChoose(XOminimax, pcOrPlayer, set);
+				} else if (hasWon(xOrO)==false &&i==8){
+					XOminimax[i]=1;
+				} else{
+					thisField=pcChoose(xOrO, pcOrPlayer);
+					float help=thisField[1];
+					for (int j=1;j<9;j++) {
+						if(help<thisField[j]) {
+							help=thisField[j];
+						}
+					}
+					XOminimax[i]=help/2;
 				}
+
 			}
 		}
-		for (int i = 0; i < 9; i++) {
-			if (thisField[i] >= 1) {
-				set = i;
-			} else {
-				set =0;
-			}
-		}
-		System.out.println(set);
-		return set;
+		return XOminimax;
 	}
 
 	public static boolean hasWon(int XO[]) {
