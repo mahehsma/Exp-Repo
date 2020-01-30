@@ -24,13 +24,16 @@ public class TicTacMain {
 				int set=0;
 				for (int j=0;j<8;j++) {
 					System.out.println(pcSet[j]);
-					if (pcSet[j]<pcSet[j+1]) {
-						set=j+1;
+					if (pcSet[set]<pcSet[j]) {
+						set=j;
 					}
 				}
 				XO[set] = 1;
 				System.out.println(set);
 				pcOrPlayer = false;
+				for(int k=0; k<9;k++) {
+					System.out.print(XO[k]);
+				}
 			} else {
 				System.out.println("Wähle ein Feld (0-8)");
 				do {
