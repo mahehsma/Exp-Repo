@@ -17,8 +17,9 @@ public class TicTacToeMain {
 		Board board = new Board();
 		boolean playerIsNext = true;
 		System.out.println("Welcome to TicTacToe");
+		board.printField();
 		for (int i = 0; i < 9; i++) {
-			System.out.println("Round :" + i);
+//			System.out.println("Round :" + i);
 			if (playerIsNext) {
 				// input user
 				System.out.println("Your turn! Choose an empty field!");
@@ -26,13 +27,16 @@ public class TicTacToeMain {
 				int input;
 				do {
 					input = in.nextInt();
+					if(input >= 0 && input <= 8 && board.getField()[input] != ' ') {
+						System.out.println("This field is already used! Choose another!");
+						board.printField();
+					}
 				} while (input < 0 || input > 8 || board.getField()[input] != ' ');
 				board.setField(input, 'X');
 				playerIsNext = false;
 			} else {
-				// computer
-				// board.setField(chooseField(board.getField(), board), 'O');
-				board.setField(bestMove(board), 'O');
+				// pc / algorithm
+				bestMove(board);
 				playerIsNext = true;
 			}
 			board.printField();
@@ -54,9 +58,12 @@ public class TicTacToeMain {
 
 	}
 
-	public static int bestMove(Board board) {
+	public static void bestMove(Board board) {
+		/*	
+		 * searches for best move for pc (best possible --> win = 1)
+		 */
 		int score;
-		int bestMove = 0;
+		int move = 0; //position with best outcome
 		int bestScore = -1;
 		char[] testField = new char[9];
 		for (int i = 0; i < 9; i++) {
@@ -69,30 +76,37 @@ public class TicTacToeMain {
 				testField[i] = ' ';
 				if (score > bestScore) {
 					bestScore = score;
-					bestMove = i;
+					move = i;
 				}
 			}
 		}
-		return bestMove;
+		board.setField(move, 'O');
 	}
 
-	public static int minimax(Board board, boolean isMaximizing, char[] testField) {
+	public static int minimax(Board board, boolean isMaximizing, char[] test) {
+		char testField[] = new char[9];
+		for(int i=0;i<9;i++) {
+			testField=test;
+		}
 		if (board.hasWon(testField)) {
-			int score;
 			if (isMaximizing) {
-				score = 1;
+				//bad score gets returned because the player did the last move
+				return -1;
 			} else {
-				score = -1;
+				//good score gets returned because the pc / algorithm did the last move
+				return 1;
 			}
-			return score;
 		}
 		if (board.tie(testField)) {
+			//nobody has won
 			return 0;
 		}
+		// pc is trying to maximize, searches for move with best outcome 
 		if (isMaximizing) {
-			int score = -1;
+			int score;
 			int bestScore = -1;
 			for (int i = 0; i < 9; i++) {
+				// puts an 'O' on position 'i' if empty, evaluates the outcome and undo it
 				if (testField[i] == ' ') {
 					testField[i] = 'O';
 					score = minimax(board, false, testField);
@@ -104,9 +118,11 @@ public class TicTacToeMain {
 			}
 			return bestScore;
 		} else {
-			int score = 1;
+			// assuming the player is doing best possible move, the algorithm searches for worst possible move for the pc
+			int score;
 			int bestScore = 1;
 			for (int i = 0; i < 9; i++) {
+				// puts an 'X' on possition 'i' if empty, evaluates the outcome and undo it
 				if (testField[i] == ' ') {
 					testField[i] = 'X';
 					score = minimax(board, true, testField);
@@ -119,63 +135,4 @@ public class TicTacToeMain {
 			return bestScore;
 		}
 	}
-
-//	public static int chooseField(char field[], Board board) {
-//		// logic
-//		boolean playerIsNext = false;
-//		double moveEvaluation[] = scanForBestMove(field, board, playerIsNext);
-//		int pointer = 0;
-//		for (int i = 0; i < 9; i++) {
-//			System.out.println(moveEvaluation[i]);
-//			if (moveEvaluation[pointer] < moveEvaluation[i]) {
-//				pointer = i;
-//			}
-//		}
-//		System.out.println("pointer: " + pointer);
-//		return pointer;
-//	}
-
-//	public static double[] minimax(char field, Board board, boolean playerIsNext) {
-//		char field2[] = new char[9];
-//
-//	}
-
-//	public static double[] scanForBestMove(char field[], Board board, boolean playerIsNext) {
-//		char testField[]=new char[9];
-//		double bestMove[] = new double[9];
-//		for(int k=0;k<9;k++) {
-//			bestMove[k]=0;
-//			//field is not empty
-//			
-//			testField[k]=field[k];
-//		}
-//		for (int i = 0; i < 9; i++) {
-//			if (testField[i] == ' ') {
-//				double help[];
-//				if (playerIsNext) {
-//					testField[i] = 'X';
-//					help=scanForBestMove(testField, board, false);
-//				} else {
-//					testField[i] = 'O';
-//					help=scanForBestMove(testField, board, true);
-//				}
-//				if (board.hasWon(testField)) {
-//					if (playerIsNext) {
-//						bestMove[i] = 1;
-//					} else {
-//						bestMove[i] = 1;
-//					}
-//
-//				} else {
-//					testField[i] = ' '; //resets the move
-//					for(int k=0;k<9;k++) {
-//						bestMove[i]=bestMove[i]+help[k]/9.0;
-//					}
-//				}
-//			}
-//
-//		}
-//		return bestMove;
-//	}
-
 }
